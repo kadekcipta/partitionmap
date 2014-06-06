@@ -1,4 +1,4 @@
-// +build !parallel
+// +build parallel
 
 package partitionmap
 
@@ -8,10 +8,18 @@ import (
 
 func BenchmarkPartitionMap(b *testing.B) {
 	pm := New(128)
-	doTask(b, pm)
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			doTask(b, pm)
+		}
+	})
 }
 
 func BenchmarkNonPartitionMap(b *testing.B) {
 	m := &partition{m: map[string]interface{}{}}
-	doTask(b, m)
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			doTask(b, m)
+		}
+	})
 }
